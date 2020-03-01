@@ -11,7 +11,7 @@ export class Syncer {
 
     this.url = link;
     this.modifier = opts.modifier || (async yml => console.log(yml));
-    this.interval = opts.interval || 60 * 1000;
+    this.interval = opts.interval;
   }
 
   fetch() {
