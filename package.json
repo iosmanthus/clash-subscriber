@@ -51,11 +51,10 @@
   },
   "scripts": {
     "prepack": "rm -rf lib && tsc -b && oclif-dev readme",
-    "dev": "tsc -w",
+    "devhus/clash-subscriber": "tsc -w",
     "version": "oclif-dev readme && git add README.md"
   },
   "types": "lib/index.d.ts",
-  "description": "[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io) [![Version](https://img.shields.io/npm/v/clash-subscriber.svg)](https://npmjs.org/package/clash-subscriber) [![Downloads/week](https://img.shields.io/npm/dw/clash-subscriber.svg)](https://npmjs.org/package/clash-subscriber) [![License](https://img.shields.io/npm/l/clash-subscriber.svg)](https://github.com/iosmanthus/clash-subscriber/blob/master/package.json)",
   "directories": {
     "lib": "lib"
   }

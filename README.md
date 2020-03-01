@@ -1,14 +1,13 @@
 # Clash Subscriber
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/clash-subscriber.svg)](https://npmjs.org/package/clash-subscriber)
-[![Downloads/week](https://img.shields.io/npm/dw/clash-subscriber.svg)](https://npmjs.org/package/clash-subscriber)
-[![License](https://img.shields.io/npm/l/clash-subscriber.svg)](https://github.com/iosmanthus/clash-subscriber/blob/master/package.json)
+[![Version](https://img.shields.io/npm/v/@iosmanthus/clash-subscriber)](https://npmjs.org/package/iosmanthus/clash-subscriber)
+[![License](https://img.shields.io/npm/l/@iosmanthus/clash-subscriber)](https://github.com/iosmanthus/clash-subscriber/blob/master/package.json)
 
 ## Installation
 
 ```sh
-npm install -g clash-subscriber
+npm install -g @iosmanthus/clash-subscriber
 ```
 
 ## Usage
