@@ -1,0 +1,53 @@
+{
+  "name": "clash-subscriber",
+  "version": "0.1.0",
+  "author": "Iosmanthus Teng @iosmanthus",
+  "bin": {
+    "clash-subscriber": "./bin/run"
+  },
+  "bugs": "https://github.com/iosmanthus/clash-subscriber/issues",
+  "dependencies": {
+    "@oclif/command": "^1",
+    "@oclif/config": "^1",
+    "@oclif/plugin-help": "^2",
+    "@types/js-yaml": "^3.12.2",
+    "axios": "^0.19.2",
+    "loglevel": "^1.6.7",
+    "loglevel-plugin-prefix": "^0.8.4",
+    "tslib": "^1",
+    "tslint": "^6.0.0",
+    "tslint-config-airbnb": "^5.11.2"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1",
+    "@types/node": "^10",
+    "ts-node": "^8",
+    "typescript": "^3.3"
+  },
+  "prettier": {
+    "singleQuote": true
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/lib"
+  ],
+  "homepage": "https://github.com/iosmanthus/clash-subscriber",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "oclif": {
+    "bin": "clash-subscriber"
+  },
+  "repository": "iosmanthus/clash-subscriber",
+  "scripts": {
+    "prepack": "rm -rf lib && tsc -b && oclif-dev readme",
+    "dev": "tsc -w",
+    "version": "oclif-dev readme && git add README.md"
+  },
+  "types": "lib/index.d.ts"
+}
