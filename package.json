@@ -1,11 +1,13 @@
 {
-  "name": "clash-subscriber",
+  "name": "@iosmanthus/clash-subscriber",
   "version": "0.1.0",
   "author": "Iosmanthus Teng @iosmanthus",
   "bin": {
-    "clash-subscriber": "./bin/run"
+    "clash-subscriber": "bin/run"
   },
-  "bugs": "https://github.com/iosmanthus/clash-subscriber/issues",
+  "bugs": {
+    "url": "https://github.com/iosmanthus/clash-subscriber/issues"
+  },
   "dependencies": {
     "@oclif/command": "^1",
     "@oclif/config": "^1",
@@ -43,11 +45,18 @@
   "oclif": {
     "bin": "clash-subscriber"
   },
-  "repository": "iosmanthus/clash-subscriber",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iosmanthus/clash-subscriber.git"
+  },
   "scripts": {
     "prepack": "rm -rf lib && tsc -b && oclif-dev readme",
     "dev": "tsc -w",
     "version": "oclif-dev readme && git add README.md"
   },
-  "types": "lib/index.d.ts"
+  "types": "lib/index.d.ts",
+  "description": "[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io) [![Version](https://img.shields.io/npm/v/clash-subscriber.svg)](https://npmjs.org/package/clash-subscriber) [![Downloads/week](https://img.shields.io/npm/dw/clash-subscriber.svg)](https://npmjs.org/package/clash-subscriber) [![License](https://img.shields.io/npm/l/clash-subscriber.svg)](https://github.com/iosmanthus/clash-subscriber/blob/master/package.json)",
+  "directories": {
+    "lib": "lib"
+  }
 }
