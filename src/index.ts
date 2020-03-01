@@ -6,6 +6,7 @@ import * as log from 'loglevel';
 import * as prefix from 'loglevel-plugin-prefix';
 import * as yaml from 'js-yaml';
 import * as path from 'path';
+import { parseConfig } from './config';
 
 prefix.reg(log);
 prefix.apply(log, { template: '[%t] %l:' });
@@ -29,6 +30,11 @@ class ClashSubscriber extends Command {
       default: `${ClashSubscriber.DEFAULT_INTERVAL}`,
       description: 'Interval to fetch configuration, in minutes',
     }),
+    config: flags.string({
+      char: 'c',
+      default: '',
+      description: "Config the slash, e.g. -c=port:1081,socks-port:1080",
+    }),
   };
   static args = [{
     name: 'url',
@@ -38,12 +44,14 @@ class ClashSubscriber extends Command {
   async run() {
     const { args, flags } = this.parse(ClashSubscriber);
     flags.path = path.resolve(flags.path);
+    const config = parseConfig(flags.config);
     const syncer = new Syncer(args.url, {
       interval: (parseFloat(flags.interval) || ClashSubscriber.DEFAULT_INTERVAL) * 60_000,
       modifier: async (yml) => {
         log.info(`Fetch successfully.
         Saving to ${flags.path}`);
-        fs.writeFile(flags.path, yaml.safeDump(yml), async (err) => {
+        let doc = { ...yml, ...config };
+        fs.writeFile(flags.path, yaml.safeDump(doc), async (err) => {
           if (err) {
             log.error(`Fail to save config to ${flags.path}`);
             return;
@@ -62,4 +70,4 @@ class ClashSubscriber extends Command {
   }
 }
 
-export =  ClashSubscriber;
+export = ClashSubscriber;
