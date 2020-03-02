@@ -46,7 +46,7 @@ class ClashSubscriber extends Command {
     }),
     'test-url': flags.string({
       default: 'http://www.gstatic.com/generate_204',
-      dependsOn: ['url-test-only'],
+      dependsOn: ['url-test-group-only'],
       description: 'test url, valid only while flag `url-test-only` is set',
     }),
     'test-interval': flags.string({
