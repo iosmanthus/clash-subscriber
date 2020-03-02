@@ -10,12 +10,17 @@ export class Syncer {
     const link = opts.args?.reduce((url, opt) => `${url}&${opt}`, url) || url;
 
     this.url = link;
-    this.modifier = opts.modifier || (async yml => console.log(yml));
+    this.modifier =
+      opts.modifier ||
+      (async (yml) => {
+        console.log(yml);
+      });
     this.interval = opts.interval;
   }
 
   fetch() {
-    axios.get<string>(this.url)
+    axios
+      .get<string>(this.url)
       .then(({ data }) => this.modifier(yaml.safeLoad(data)))
       .catch(() => log.error(`Fail to fetch data from ${this.url}`));
   }
