@@ -26,6 +26,6 @@ OPTIONS
   -l, --url=url                  (required) subscription link
   -t, --controller=controller    [default: http://localhost:9090]
   -v, --version                  show CLI version
-  --test-interval=test-interval  [default: 600] test interval, valid only while flag `url-test-only` is set, in seconds
+  --test-interval=test-interval  [default: 600] test interval, valid only while flag `url-test-group-only` is set, in seconds
   --test-url=test-url            [default: http://www.gstatic.com/generate_204] test url, valid only while flag `url-test-only` is set
 ```

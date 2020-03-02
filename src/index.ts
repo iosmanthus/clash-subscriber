@@ -51,7 +51,7 @@ class ClashSubscriber extends Command {
     }),
     'test-interval': flags.string({
       default: '600',
-      dependsOn: ['url-test-only'],
+      dependsOn: ['url-test-group-only'],
       description:
         'test interval, valid only while flag `url-test-only` is set, in seconds',
     }),
