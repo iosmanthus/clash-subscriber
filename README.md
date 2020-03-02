@@ -23,5 +23,6 @@ OPTIONS
   -i, --interval=interval      [default: 60] Interval to fetch configuration, in minutes
   -p, --path=path              [default: /etc/clash/config.yaml]
   -t, --controller=controller  [default: http://localhost:9090]
+  -c, --config=config          Config the slash, e.g. -c=port:1081,socks-port:1080
   -v, --version                show CLI version
 ```
