@@ -39,6 +39,22 @@ class ClashSubscriber extends Command {
       description:
         'extra configurations for Clash, e.g. port=1081 socks-port=1080 allow-lan:false',
     }),
+    'url-test-group-only': flags.boolean({
+      char: 'A',
+      description:
+        'strip out all rules and proxy groups except for a url-test group via a url',
+    }),
+    'test-url': flags.string({
+      default: 'http://www.gstatic.com/generate_204',
+      dependsOn: ['url-test-only'],
+      description: 'test url, valid only while flag `url-test-only` is set',
+    }),
+    'test-interval': flags.string({
+      default: '600',
+      dependsOn: ['url-test-only'],
+      description:
+        'test interval, valid only while flag `url-test-only` is set, in seconds',
+    }),
     url: flags.string({
       char: 'l',
       required: true,
@@ -58,32 +74,37 @@ class ClashSubscriber extends Command {
 
       modifier: async (yml) => {
         log.info('Fetch successfully.');
-
         log.info('Parsing configurations.');
-        let data = yml;
+
+        let config: Config;
         try {
-          data = { ...data, ...new Config(flags.config) };
+          config = new Config(flags.config, yml);
         } catch (err) {
           log.error(err);
           process.exit(1);
         }
 
+        if (flags['url-test-group-only']) {
+          const interval = parseInt(flags['test-interval'], 10) || 600;
+          config.urlTestGroupOnly(flags['test-url'], interval);
+        }
+
         try {
-          log.info(`Saving configuration to ${flags.file}`);
-          fs.writeFileSync(flags.file, yaml.safeDump(data));
+          log.info(`Saving configuration to ${flags.file}.`);
+          fs.writeFileSync(flags.file, yaml.safeDump(config.dump()));
         } catch {
-          log.error(`Fail to save config to ${flags.file}`);
+          log.error(`Fail to save config to ${flags.file}.`);
           return;
         }
 
-        log.info(`Injecting config to ${flags.controller}`);
+        log.info(`Injecting config to ${flags.controller}.`);
         await axios
           .put(`${flags.controller}/configs?force=${true}`, {
             path: flags.file,
           })
-          .then(() => log.info('Successfully updated'))
+          .then(() => log.info('Successfully updated.'))
           .catch((err) => {
-            log.error(`Fail to update clash config via: ${flags.controller}
+            log.error(`Fail to update clash config via: ${flags.controller}.
               reason: ${err}`);
           });
       },
