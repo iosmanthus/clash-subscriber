@@ -53,6 +53,12 @@ export class Config {
     this.raw = { ...yml, ...this };
   }
 
+  public filter(regex: RegExp) {
+    this.raw['Proxy'] = this.raw['Proxy']?.filter((proxy: any) => {
+      return proxy['name']?.match(regex)?.values().next().value.length > 0;
+    });
+  }
+
   public urlTestGroupOnly(url: string, interval: number) {
     if (!this.raw['Proxy'] || this.raw['Proxy'].length === 0) {
       return;

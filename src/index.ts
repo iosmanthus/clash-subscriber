@@ -39,6 +39,10 @@ class ClashSubscriber extends Command {
       description:
         'extra configurations for Clash, e.g. port=1081 socks-port=1080 allow-lan:false',
     }),
+    filter: flags.string({
+      char: 'r',
+      description: 'use a regex to filter proxy',
+    }),
     'url-test-group-only': flags.boolean({
       char: 'A',
       description:
@@ -82,6 +86,16 @@ class ClashSubscriber extends Command {
         } catch (err) {
           log.error(err);
           process.exit(1);
+        }
+
+        if (flags['filter']) {
+          try {
+            const regex = new RegExp(flags['filter']);
+            config.filter(regex);
+          } catch (e) {
+            log.error(`Invalid regex: ${flags['filter']}. reason: ${e}`);
+            process.exit(1);
+          }
         }
 
         if (flags['url-test-group-only']) {
