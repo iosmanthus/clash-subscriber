@@ -18,15 +18,17 @@ USAGE
   $ clash-subscriber [options] -l/--url URL
 
 OPTIONS
-  -A, --url-test-group-only      strip out all rules and proxy groups except for a url-test group via a url
-  -c, --config=config            extra configurations for Clash, e.g. port=1081 socks-port=1080 allow-lan:false
-  -f, --file=file                [default: /etc/clash/config.yaml] file to save the configuration
-  -h, --help                     show CLI help
-  -i, --interval=interval        [default: 60] interval to fetch configuration, in minutes
-  -l, --url=url                  (required) subscription link
-  -r, --filter=filter            use a regex to filter proxy
-  -t, --controller=controller    [default: http://localhost:9090]
-  -v, --version                  show CLI version
-  --test-interval=test-interval  [default: 600] test interval, valid only while flag `url-test-only` is set, in seconds
-  --test-url=test-url            [default: http://www.gstatic.com/generate_204] test url, valid only while flag `url-test-only` is set
+  -G, --group-policy=group-policy  apply a group policy to proxies, retain only one proxy group and match rule
+  -c, --config=config              extra configurations for Clash, e.g. port=1081 socks-port=1080 allow-lan:false
+  -f, --file=file                  [default: /etc/clash/config.yaml] file to save the configuration
+  -h, --help                       show CLI help
+  -i, --interval=interval          [default: 60] interval to fetch configuration, in minutes
+  -l, --url=url                    (required) subscription link
+  -r, --filter=filter              use a regex to filter proxy
+  -v, --version                    show CLI version
 ```
+
+For flag `group-policy`, there are two options for it:
+
+1. `method=speed`, this option will test the download speed toward the `url=`. You can also specify a `timeout=` (default: `10s`) to limit the download time. If there is no proxy selected, `timeout` will amplify to the 1.5x of itself and try again.
+2. `method=latency`, this option will test the latency toward the `url=` which is done by `Clash` itself. You can provide an `interval` value to it (default: `1h`).

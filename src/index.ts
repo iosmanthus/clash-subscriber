@@ -1,13 +1,11 @@
 import { Syncer } from './syncer';
 import { Config } from './config';
+import { GroupPolicy } from './policy';
 
 import { Command, flags } from '@oclif/command';
-import axios from 'axios';
 
-import * as fs from 'fs';
 import * as log from 'loglevel';
 import * as prefix from 'loglevel-plugin-prefix';
-import * as yaml from 'js-yaml';
 import * as path from 'path';
 
 prefix.reg(log);
@@ -19,10 +17,6 @@ class ClashSubscriber extends Command {
   static flags = {
     version: flags.version({ char: 'v' }),
     help: flags.help({ char: 'h' }),
-    controller: flags.string({
-      char: 't',
-      default: 'http://localhost:9090',
-    }),
     file: flags.string({
       char: 'f',
       default: '/etc/clash/config.yaml',
@@ -43,21 +37,11 @@ class ClashSubscriber extends Command {
       char: 'r',
       description: 'use a regex to filter proxy',
     }),
-    'url-test-group-only': flags.boolean({
-      char: 'A',
+    'group-policy': flags.string({
+      char: 'G',
+      multiple: true,
       description:
-        'strip out all rules and proxy groups except for a url-test group via a url',
-    }),
-    'test-url': flags.string({
-      default: 'http://www.gstatic.com/generate_204',
-      dependsOn: ['url-test-group-only'],
-      description: 'test url, valid only while flag `url-test-only` is set',
-    }),
-    'test-interval': flags.string({
-      default: '600',
-      dependsOn: ['url-test-group-only'],
-      description:
-        'test interval, valid only while flag `url-test-only` is set, in seconds',
+        'apply a group policy to proxies, retain only one proxy group and match rule',
     }),
     url: flags.string({
       char: 'l',
@@ -84,7 +68,7 @@ class ClashSubscriber extends Command {
         try {
           config = new Config(flags.config, yml);
         } catch (err) {
-          log.error(err);
+          log.error(`Fail to parse config: ${flags.config}; reason: ${err}.`);
           process.exit(1);
         }
 
@@ -93,34 +77,38 @@ class ClashSubscriber extends Command {
             const regex = new RegExp(flags['filter']);
             config.filter(regex);
           } catch (e) {
-            log.error(`Invalid regex: ${flags['filter']}. reason: ${e}`);
+            log.error(`Invalid regex: ${flags['filter']}; reason: ${e}.`);
             process.exit(1);
           }
         }
 
-        if (flags['url-test-group-only']) {
-          const interval = parseInt(flags['test-interval'], 10) || 600;
-          config.urlTestGroupOnly(flags['test-url'], interval);
+        if (flags['group-policy'].length > 0) {
+          const groupPolicy = new GroupPolicy(flags['group-policy']);
+          config.registerGroupPolicy(groupPolicy);
         }
 
         try {
           log.info(`Saving configuration to ${flags.file}.`);
-          fs.writeFileSync(flags.file, yaml.safeDump(config.dump()));
-        } catch {
-          log.error(`Fail to save config to ${flags.file}.`);
+          config.saveToPath(flags.file);
+        } catch (err) {
+          log.error(`Fail to save config to ${flags.file}; reason: ${err}.`);
           return;
         }
 
-        log.info(`Injecting config to ${flags.controller}.`);
-        await axios
-          .put(`${flags.controller}/configs?force=${true}`, {
-            path: flags.file,
+        log.info(`Injecting config to ${config.controller}.`);
+        await config
+          .forceLoad(flags.file)
+          .then(() => {
+            log.info('Successfully updated.');
           })
-          .then(() => log.info('Successfully updated.'))
           .catch((err) => {
-            log.error(`Fail to update clash config via: ${flags.controller}.
-              reason: ${err}`);
+            log.error(
+              `Fail to update clash config via: ${config.controller}; reason: ${err}.`,
+            );
           });
+
+        log.info('Applying group policy.');
+        await config.applyGroupPolicy();
       },
     });
 

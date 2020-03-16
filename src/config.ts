@@ -1,15 +1,23 @@
+import { GroupPolicy } from './policy';
+import axios from 'axios';
+import * as yaml from 'js-yaml';
+import * as fs from 'fs';
 export class Config {
-  'port'?: number;
-  'socks-port'?: number;
-  'redir-port'?: number;
+  public 'port'?: number;
+  public 'socks-port'?: number;
+  public 'redir-port'?: number;
 
-  'mode'?: string;
-  'log-level'?: string;
+  public 'mode'?: string;
+  public 'log-level'?: string;
 
-  'allow-lan'?: boolean;
+  public 'allow-lan'?: boolean;
+  public 'policy'?: GroupPolicy;
   raw: any;
 
   constructor(config: string[], yml: any) {
+    if (!yml['external-controller']) {
+      throw 'Missing external-controller';
+    }
     for (const i in config) {
       const [k, v] = config[i].split(/:|=/, 2);
       switch (k) {
@@ -53,33 +61,56 @@ export class Config {
     this.raw = { ...yml, ...this };
   }
 
+  public get proxies(): string[] {
+    return this.raw['Proxy'].map(({ name }: any) => name);
+  }
+
+  public get workingMode(): string {
+    return this.raw['mode'];
+  }
+
+  public get http_port(): number {
+    return this.raw['port'];
+  }
+
+  public get controller(): string {
+    return this.raw['external-controller'];
+  }
+
   public filter(regex: RegExp) {
     this.raw['Proxy'] = this.raw['Proxy']?.filter((proxy: any) => {
-      return proxy['name']?.match(regex)?.values().next().value.length > 0;
+      return (
+        proxy['name']
+          ?.match(regex)
+          ?.values()
+          .next().value.length > 0
+      );
     });
   }
 
-  public urlTestGroupOnly(url: string, interval: number) {
+  public saveToPath(path: string) {
+    fs.writeFileSync(path, yaml.safeDump(this.raw));
+  }
+
+  public async forceLoad(path: string) {
+    await axios.put(`http://${this.controller}/configs?force=${true}`, {
+      path,
+    });
+  }
+
+  public registerGroupPolicy(policy: GroupPolicy) {
     if (!this.raw['Proxy'] || this.raw['Proxy'].length === 0) {
       return;
     }
-    this.raw['Proxy Group'] = [
-      {
-        name: 'Auto',
-        type: 'url-test',
-        proxies: this.raw['Proxy']?.map((proxy: any) => {
-          return proxy['name'];
-        }),
-        // tslint:disable-next-line: object-shorthand-properties-first
-        url,
-        // tslint:disable-next-line: object-shorthand-properties-first
-        interval,
-      },
-    ];
-    this.raw['Rule'] = ['MATCH,Auto'];
+    this.policy = policy;
+    const group = policy.register(this);
+    this.raw['Proxy Group'] = [group];
+    this.raw['Rule'] = [`MATCH,${group.name}`];
   }
 
-  public dump(): any {
-    return this.raw;
+  public async applyGroupPolicy() {
+    if (this.policy && this.policy.apply) {
+      await this.policy.apply(this.raw['Proxy Group'][0], this);
+    }
   }
 }
