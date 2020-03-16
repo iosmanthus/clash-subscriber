@@ -13,6 +13,7 @@
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
     "@types/js-yaml": "^3.12.2",
+    "@types/tunnel": "^0.0.1",
     "axios": "^0.19.2",
     "loglevel": "^1.6.7",
     "loglevel-plugin-prefix": "^0.8.4",
@@ -20,7 +21,8 @@
     "p-timeout": "^3.2.0",
     "tslib": "^1",
     "tslint": "^6.0.0",
-    "tslint-config-airbnb": "^5.11.2"
+    "tslint-config-airbnb": "^5.11.2",
+    "tunnel": "^0.0.6"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1",

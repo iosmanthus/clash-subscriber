@@ -1,5 +1,7 @@
 import { Config } from './config';
 import axios from 'axios';
+
+import * as tunnel from 'tunnel';
 import * as pTime from 'p-time';
 import * as pTimeout from 'p-timeout';
 import * as log from 'loglevel';
@@ -58,13 +60,20 @@ export class GroupPolicy {
   }
 
   async testSpeed(port: number): Promise<number> {
+    const httpsAgent = tunnel.httpsOverHttp({
+      proxy: {
+        port,
+        host: '127.0.0.1',
+      },
+    });
     const download = pTime(async () => {
       await pTimeout(
         axios({
-          method: 'get',
-          url: this.url,
+          httpsAgent,
+          method: 'GET',
+          baseURL: this.url,
           responseType: 'arraybuffer',
-          proxy: { port, host: '127.0.0.1' },
+          proxy: false,
         }),
         this.timeout,
       );
@@ -116,7 +125,9 @@ export class GroupPolicy {
   }
 
   public async applyLatencyPolicy(group: ProxyGroup, config: Config) {
-    log.info(`Successfully select ${group.name} in mode: ${config.workingMode}.`);
+    log.info(
+      `Successfully select ${group.name} in mode: ${config.workingMode}.`,
+    );
   }
 
   public register(config: Config): ProxyGroup {
