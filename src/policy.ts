@@ -59,11 +59,11 @@ export class GroupPolicy {
       });
   }
 
-  async testSpeed(port: number): Promise<number> {
+  async testSpeed(host: string, port: number): Promise<number> {
     const httpsAgent = tunnel.httpsOverHttp({
       proxy: {
         port,
-        host: '127.0.0.1',
+        host,
       },
     });
     const download = pTime(async () => {
@@ -97,7 +97,8 @@ export class GroupPolicy {
     for (const i in proxies) {
       try {
         await this.selectProxy(controller, 'GLOBAL', proxies[i]);
-        const time = await this.testSpeed(config.http_port);
+        const [host, _] = config.controller.split(/:/, 2);
+        const time = await this.testSpeed(host, config.http_port);
         log.info(`${proxies[i]}'s latency: ${time} ms.`);
         if (!min || min.time > time) {
           min = { time, name: proxies[i] };

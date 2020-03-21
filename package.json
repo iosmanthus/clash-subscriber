@@ -1,6 +1,6 @@
 {
   "name": "@iosmanthus/clash-subscriber",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "author": "Iosmanthus Teng @iosmanthus",
   "bin": {
     "clash-subscriber": "bin/run"

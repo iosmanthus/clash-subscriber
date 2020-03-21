@@ -3,15 +3,17 @@ import axios from 'axios';
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 export class Config {
-  public 'port'?: number;
-  public 'socks-port'?: number;
-  public 'redir-port'?: number;
+  'port'?: number;
+  'socks-port'?: number;
+  'redir-port'?: number;
 
-  public 'mode'?: string;
-  public 'log-level'?: string;
+  'mode'?: string;
+  'log-level'?: string;
 
-  public 'allow-lan'?: boolean;
-  public 'policy'?: GroupPolicy;
+  'allow-lan'?: boolean;
+  'external-controller'?: string;
+
+  'policy'?: GroupPolicy;
   raw: any;
 
   constructor(config: string[], yml: any) {
@@ -19,13 +21,13 @@ export class Config {
       throw 'Missing external-controller';
     }
     for (const i in config) {
-      const [k, v] = config[i].split(/:|=/, 2);
+      const [k, v] = config[i].split(/=/, 2);
       switch (k) {
         case 'port':
         case 'socks-port':
         case 'redir-port':
           const port = parseInt(v, 10);
-          if (!port || port < 0 || port > 65535) {
+          if (port < 0 || port > 65535) {
             throw `Port out of range: ${port}.`;
           }
           this[k] = port;
@@ -53,6 +55,9 @@ export class Config {
             throw `Invalid allow-lan settings: ${v}.`;
           }
           this[k] = v === 'true';
+          break;
+        case 'external-controller':
+          this[k] = v;
           break;
         default:
           throw `Unknown key: '${k}'.`;

@@ -22,6 +22,11 @@ class ClashSubscriber extends Command {
       default: '/etc/clash/config.yaml',
       description: 'file to save the configuration',
     }),
+    'virtual-path': flags.string({
+      char: 'p',
+      description:
+        'virtual file path to load the configuration. useful in docker. default value as same as the `file`',
+    }),
     interval: flags.string({
       char: 'i',
       default: `${ClashSubscriber.DEFAULT_INTERVAL}`,
@@ -31,7 +36,7 @@ class ClashSubscriber extends Command {
       char: 'c',
       multiple: true,
       description:
-        'extra configurations for Clash, e.g. port=1081 socks-port=1080 allow-lan:false',
+        'extra configurations for Clash, e.g. port=1081 socks-port=1080 allow-lan=false external-controller=172.18.0.2:9090',
     }),
     filter: flags.string({
       char: 'r',
@@ -55,6 +60,9 @@ class ClashSubscriber extends Command {
   async run() {
     const { flags } = this.parse(ClashSubscriber);
     flags.file = path.resolve(flags.file);
+    if (!flags['virtual-path']) {
+      flags['virtual-path'] = flags.file;
+    }
     const syncer = new Syncer(flags.url, {
       interval:
         (parseFloat(flags.interval) || ClashSubscriber.DEFAULT_INTERVAL) *
@@ -97,7 +105,7 @@ class ClashSubscriber extends Command {
 
         log.info(`Injecting config to ${config.controller}.`);
         await config
-          .forceLoad(flags.file)
+          .forceLoad(<string>flags['virtual-path'])
           .then(() => {
             log.info('Successfully updated.');
           })
@@ -105,6 +113,7 @@ class ClashSubscriber extends Command {
             log.error(
               `Fail to update clash config via: ${config.controller}; reason: ${err}.`,
             );
+            process.exit(1);
           });
 
         log.info('Applying group policy.');
